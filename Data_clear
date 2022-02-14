@@ -1,0 +1,61 @@
+package javaintro.ws21.wang;
+
+import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+
+public class Datensaubemachen {
+    public static void main(String[] args) {
+        removeRecord("D:/Heidelberg/3.Semester/Java/yellow_tripdata_2016-04.csv", "0", 6, ",");
+    }
+
+    private static void removeRecord(String filepath, String removeTerm, int positionOfTerm, String delimiter) {
+
+        int position = positionOfTerm - 1;
+        String tempFile = "temp.csv";
+        File oldFile = new File(filepath);
+        File newFile = new File(tempFile);
+
+        String currentLine;
+        String data[];
+
+        try {
+            FileWriter fw = new FileWriter(tempFile, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter pw = new PrintWriter(fw);
+
+            FileReader fr = new FileReader(filepath);
+            BufferedReader br = new BufferedReader(fr);
+
+            while ((currentLine = br.readLine()) != null) {
+                data = currentLine.split(",");
+                if (!(data[position].equalsIgnoreCase(removeTerm))) {
+                    pw.println(currentLine);
+                }
+            }
+
+
+            pw.flush();
+            pw.close();
+            fr.close();
+            br.close();
+            bw.close();
+            fw.close();
+
+            oldFile.delete();
+            File dump = new File(filepath);
+            newFile.renameTo(dump);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+
+    }
+}
