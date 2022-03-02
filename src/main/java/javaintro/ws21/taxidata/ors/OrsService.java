@@ -19,7 +19,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * OrsService use the http://openrouteservice to get a route between two coordinates
+ * OrsService use the http://openrouteservice to get a route between two
+ * coordinates
  * 
  * <pre>
  * OrsService ors = new OrsService("http://localhost:8080/ors");
@@ -28,26 +29,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 public class OrsService {
+
+	public static void main(String[] args) throws IOException, InterruptedException {
+		OrsService ors = new OrsService("http://129.206.7.141:8080/ors");
+		Route route = ors.request(-73.866234, 40.762602, -73.988361, 40.743242, Preference.FASTEST);
+		System.out.println(route);
+	}
+
 	public enum Preference {
 		FASTEST, SHORTEST;
-		
+
 		@Override
 		public String toString() {
 			return name().toLowerCase();
 		}
 	}
-	
+
 	private final ObjectMapper jackson = new ObjectMapper();
 	private final GeoJSONReader geoJSON = new GeoJSONReader();
 
-	private final HttpClient client = HttpClient.newBuilder()
-			.version(HttpClient.Version.HTTP_2).build();
+	private final HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
 	private final URI endpoint;
-	
+
 	public OrsService(String endpoint) {
 		this.endpoint = URI.create(endpoint + "/v2/directions/driving-car/geojson");
 	}
-
 
 	public Route request(Coordinate start, Coordinate end, Preference preference)
 			throws IOException, InterruptedException {
@@ -58,7 +64,7 @@ public class OrsService {
 			throws IOException, InterruptedException {
 		Map<String, Object> body = new LinkedHashMap<>();
 		body.put("coordinates", new double[][] { { startLon, startLat }, { endLon, endLat } });
-		body.put("geometry_simplify", true);
+		body.put("geometry_simplify", false);
 		body.put("instructions", false);
 		body.put("preference", preference.toString());
 		return request(jackson.writeValueAsString(body));
@@ -66,13 +72,10 @@ public class OrsService {
 
 	private Route request(String body) throws IOException, InterruptedException {
 		// System.out.println(body);
-		HttpRequest request = HttpRequest.newBuilder()
-				.uri(endpoint)
-				.header("Content-Type", "application/json")
-				.header("charset", "utf-8")
-				.header("Accept", "application/geo+json")
-				.POST(BodyPublishers.ofString(body)).build();
-		
+		HttpRequest request = HttpRequest.newBuilder().uri(endpoint).header("Content-Type", "application/json")
+				.header("charset", "utf-8").header("Accept", "application/geo+json").POST(BodyPublishers.ofString(body))
+				.build();
+
 		HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
 		int statusCode = response.statusCode();

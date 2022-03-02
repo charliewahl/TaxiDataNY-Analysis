@@ -1,7 +1,9 @@
+package javaintro.ws21.taxidata.ors;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class pickupDate {
+public class TaxiRecord {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -13,7 +15,7 @@ public class pickupDate {
     private final double dropoffLongitude;
     private final double dropoffLatitude;
 
-    public pickupDate(int passengers, LocalDateTime pickupTime, LocalDateTime dropoffTime, double pickupLongitude, double pickupLatitude, double dropoffLongitude, double dropoffLatitude) {
+    public TaxiRecord(int passengers, LocalDateTime pickupTime, LocalDateTime dropoffTime, double pickupLongitude, double pickupLatitude, double dropoffLongitude, double dropoffLatitude) {
         this.passengers = passengers;
         this.pickupTime = pickupTime;
         this.dropoffTime = dropoffTime;
@@ -23,7 +25,7 @@ public class pickupDate {
         this.dropoffLatitude = dropoffLatitude;
     }
 
-    public pickupDate(String[] row) {
+    public TaxiRecord(String[] row) {
         passengers = Integer.parseInt(row[3]);
         pickupTime = LocalDateTime.parse(row[1], formatter);
         dropoffTime = LocalDateTime.parse(row[2], formatter);
@@ -31,8 +33,6 @@ public class pickupDate {
         pickupLatitude = Double.parseDouble(row[6]);
         dropoffLongitude = Double.parseDouble(row[9]);
         dropoffLatitude = Double.parseDouble(row[10]);
-        pickupTime.getHour();
-
     }
 
     public int getPassengers() {
