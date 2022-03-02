@@ -1,0 +1,63 @@
+package javaintro.ws21.wang;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+
+public class TaxiRecord {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final int passangers;
+    private final double pickupLongitude;
+    private final double pickupLatitude;
+    private final double dropoffLongitude;
+    private final double dropoffLatitude;
+    private final LocalDateTime pickupTime;
+    private final LocalDateTime dorpoffTime;
+
+
+    public TaxiRecord(String[] row) throws Exception{
+
+
+        //System.out.println(Arrays.toString(row));
+        passangers = Integer.parseInt(row[3]);
+
+        dorpoffTime = LocalDateTime.parse(row[2], formatter);
+        pickupTime = LocalDateTime.parse(row[1], formatter);
+        dropoffLongitude = Double.parseDouble(row[7]);
+        dropoffLatitude = Double.parseDouble(row[8]);
+        pickupLongitude = Double.parseDouble(row[5]);
+        pickupLatitude = Double.parseDouble(row[6]);
+
+        //...
+
+
+    }
+
+    public int getPassangers() {
+        return passangers;
+    }
+
+    public double getPickupLongitude() {
+        return pickupLongitude;
+    }
+
+    public double getPickupLatitude() {
+        return pickupLatitude;
+    }
+
+    public double getDropoffLongitude() {
+        return dropoffLongitude;
+    }
+
+    public double getDropoffLatitude() {
+        return dropoffLatitude;
+    }
+
+    public LocalDateTime getPickupTime() {
+        return pickupTime;
+    }
+
+    public LocalDateTime getDorpoffTime() {
+        return dorpoffTime;
+    }
+}
