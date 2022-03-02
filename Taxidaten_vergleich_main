@@ -1,0 +1,140 @@
+package javaintro.ws21.wang;
+
+
+import static org.geotools.referencing.crs.DefaultGeographicCRS.WGS84;
+
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridCoverageFactory;
+import org.geotools.data.FileDataStore;
+import org.geotools.data.FileDataStoreFinder;
+import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.gce.geotiff.GeoTiffWriter;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.process.vector.HeatmapSurface;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+
+import java.io.*;
+import java.nio.file.Path;
+
+public class TaxidataMain {
+
+    private static final GridCoverageFactory gcf = new GridCoverageFactory();
+
+
+    //private static final org.geotools.styling.SLD SLD = ;
+
+    public static void main(String[] args) throws IOException, FactoryException, TransformException {
+//        // display a data store file chooser dialog for shapefiles
+//        File file = JFileDataStoreChooser.showOpenFile("shp", null);
+//        if (file == null) {
+//            return;
+//        }
+        Path datadir = Path.of("D:/Heidelberg/3.Semester/Java/Project");
+        FileDataStore store = FileDataStoreFinder.getDataStore(datadir.resolve("taxi_zones.shp").toFile());
+        SimpleFeatureSource zoneSource = ((org.geotools.data.FileDataStore) store).getFeatureSource();
+        ReferencedEnvelope zonesBounds = zoneSource.getBounds();
+        CoordinateReferenceSystem wgs84 = WGS84;
+        MathTransform transform = CRS.findMathTransform(zonesBounds.getCoordinateReferenceSystem(), wgs84, true);
+
+        zonesBounds = new ReferencedEnvelope(JTS.transform(zonesBounds, transform), wgs84);
+        System.out.println(zonesBounds);
+
+        HeatmapSurface heatmap = new HeatmapSurface(10, zonesBounds, 1000, 1000);
+        //zonesBounds.contains();
+
+        try (InputStream fis = new FileInputStream(datadir.resolve("green_tripdata_2015-03.csv").toFile());
+             // InputStream gzipped = new GZIPInputStream(file);
+             Reader reader = new InputStreamReader(fis);
+             BufferedReader lines = new BufferedReader(reader)) {
+            String line = lines.readLine();
+            String[] row = line.split(",");
+
+            for (int i = 0; i < row.length; i = i + 1) {
+                System.out.printf("%2d - %s%n", i, row[i]);
+            }
+
+            while ((line = lines.readLine()) != null) {
+                row = line.split(",");
+                // System.out.println(line);
+
+
+                TaxiRecord record =new TaxiRecord(row);
+                  //TaxiRecord record = null;
+//                try {
+//                    record = new TaxiRecord(row);
+//                } catch (Exception e) {
+//                    //e.printStackTrace();
+//                    continue;
+//                }
+
+
+                int passangers = record.getPassangers();
+                //double pickuplon = record.getDropoffLongitude();
+                //double pickuplat = record.getDropoffLatitude();
+                double dropofflon = record.getDropoffLongitude();
+                double dropofflat = record.getDropoffLatitude();
+
+                //creatLine(pickuplat, pickuplon, dropofflat, dropofflon);
+                if (zonesBounds.contains(dropofflon, dropofflat)) {
+
+                    heatmap.addPoint(dropofflon, dropofflat, 1);
+                }
+            }
+            //write geotiff
+
+            float[][] data = flipXY(heatmap.computeSurface());
+            GridCoverage2D gc = gcf.create("name", data, zonesBounds);
+            File file = new File("D:/Heidelberg/3.Semester/Java/Project/GNY_dropoff.tiff");
+            GeoTiffWriter writer = new GeoTiffWriter(file);
+            writer.write(gc, null);
+            writer.dispose();
+
+
+            // Create a map content and add our shapefile to it
+//        MapContent map = new MapContent();
+////        map.setTitle("Quickstart");
+
+//        Style style = SLD.createSimpleStyle(featureSource.getSchema());
+//        Layer layer = new FeatureLayer(featureSource, style);
+//        map.addLayer(layer);
+
+            // Now display the map
+            //  JMapFrame.showMap(map);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+//private static void creatLine(double pickuplat, double pickuplon, double dropofflat, double dropofflon) {
+    }
+
+    private static float[][] flipXY(float[][] grid) {
+        int xsize = grid.length;
+        int ysize = grid[0].length;
+        float[][] grid2 = new float[ysize][xsize];
+
+        for (int ix = 0; ix < xsize; ++ix) {
+            for (int iy = 0; iy < ysize; ++iy) {
+                int iy2 = ysize - iy - 1;
+                grid2[iy2][ix] = grid[ix][iy];
+
+            }
+
+        }
+        return grid2;
+    }
+}
+
+
+//    private static void saveTable() {
+//
+//    }
+//
+
+//
+//    }
+//}
