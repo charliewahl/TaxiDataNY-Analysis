@@ -14,7 +14,6 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -27,30 +26,29 @@ public class CsvFilter {
 
 	private static final GridCoverageFactory gcf = new GridCoverageFactory();
 
-	static Map<String, String> map = new HashMap<String,String>();
+	static Map<String, String> map = new HashMap<>();
 
 
 	public static void main(String[] args) throws IOException, FactoryException, TransformException {
 
-		Path csvPath = Path.of("yellow_tripdata_2016-04.csv");
+		Path csvPath = Path.of("yellow_tripdata_2016-01.csv");
 		String line = "";
 		String csvSplitBy = ",";
 
 		FileDataStore store = FileDataStoreFinder.getDataStore(csvPath.resolve("C:\\Users\\charl\\OneDrive\\Dokumente\\Uni\\Geo\\Java\\taxi_zones\\taxi_zones.shp").toFile());
-		SimpleFeatureSource zonesSource = store.getFeatureSource();       //"store" wie Datenbankverbindung
+		SimpleFeatureSource zonesSource = store.getFeatureSource(); 								      //"store" wie Datenbankverbindung
 		ReferencedEnvelope zonesBounds = zonesSource.getBounds();
 		CoordinateReferenceSystem wgs84 = CRS.decode("epsg:4326");
 		MathTransform transform = CRS.findMathTransform(zonesBounds.getCoordinateReferenceSystem(), wgs84, true);  //transformation
 
 		zonesBounds = new ReferencedEnvelope(JTS.transform(zonesBounds, transform), wgs84);
 
-		HeatmapSurface heatmap = new HeatmapSurface(10, zonesBounds, 1000, 1000);
-
+		HeatmapSurface heatmap = new HeatmapSurface(10, zonesBounds, 2500, 2500);		//auflösung-pixelanzahl
 
 
 		int[] pickupPagengersPerHour = new int[24];
 		Map<Integer, Integer> histoPassengerRides = new TreeMap<>();
-		Map<String, String> Tripdata = new HashMap<String, String>();
+		Map<String, String> tripdata = new HashMap<>();
 
 
 		LocalDateTime start = LocalDateTime.of(2016, 04, 4, 14, 36, 32);
@@ -68,35 +66,59 @@ public class CsvFilter {
 				}
 
 
-
 				if (row.getPickupTime().isAfter(start) && row.getPickupTime().isBefore(end)) {
 					// do something here
 					System.out.println("testzeitraum");
-					System.out.println("Longitude: " + row.getPickupLongitude() + "Latitude: " +  row.getPickupLatitude());
+					System.out.println("Longitude: " + row.getPickupLongitude() + "Latitude: " + row.getPickupLatitude());
+					System.out.println("DropoffLat: " + row.getDropoffLatitude() + "DropoffLong: " + row.getDropoffLongitude());
 
 					double pickupLatitude = row.getPickupLatitude();
 					double pickupLongitude = row.getPickupLongitude();
 					double dropoffLatitude = row.getDropoffLatitude();
 					double dropoffLongitude = row.getDropoffLongitude();
-					heatmap.addPoint(pickupLatitude,pickupLongitude,1);
+					heatmap.addPoint(pickupLatitude, pickupLongitude, 1);
+					heatmap.addPoint(dropoffLatitude,dropoffLongitude, 1);
+
+
 
 					/*Tripdata.put(csv[5], csv[6])
 					for (Map.Entry<String, String> entry : Tripdata.entrySet()) {
 						String PickupLongitude = entry.getKey();
 						String DropoffLatitude = entry.getValue();
-						System.out.println("Time [PiLongitude= " + PickupLongitude + " , Dropofflatitude=" + DropoffLatitude + "]"); */
+						System.out.println("Time [PiLongitude= " + PickupLongitude + " , Dropofflatitude=" + DropoffLatitude + "]");
 					}
-
+*/
 
 					int pickupHour = row.getPickupTime().getHour();
-					if (pickupHour >= 5 && pickupHour <= 18) {
 
+
+					if (pickupHour >= 5 && pickupHour <= 12) {
+						heatmap.addPoint(pickupLatitude, pickupLongitude, 1);
+						heatmap.addPoint(dropoffLatitude, dropoffLongitude, 1);
+						System.out.println("Tageszeit-morgens: " + pickupHour);
+
+						System.out.println("histo passengers:");
+						System.out.println("passengers,rides");
+						for (Map.Entry<Integer, Integer> entry : histoPassengerRides.entrySet()) {
+							System.out.printf("%d,%d%n", entry.getKey(), entry.getValue().intValue());
+						}
+						System.out.println();
+						System.out.println("aggregate pickup passengers per hour");
+						System.out.println("hour,passengers");
+						for (int h = 0; h < pickupPagengersPerHour.length; h++) {
+							System.out.printf("%2d,%d%n", h, pickupPagengersPerHour[h]);
 					}
+					}
+
+
 					pickupPagengersPerHour[pickupHour] += row.getPassengers();
 					Integer rides = histoPassengerRides.getOrDefault(row.getPassengers(), 0);
 					histoPassengerRides.put(row.getPassengers(), rides + 1);
 				}
+
 			}
+
+
 			float[][] data = heatmap.computeSurface();
 			GridCoverage2D gc = gcf.create("name", data, zonesBounds);
 			File file = new File("example.tiff");
@@ -104,7 +126,7 @@ public class CsvFilter {
 			writer.write(gc, null);
 			writer.dispose();
 
-			System.out.println("histo passengers:");
+			/* System.out.println("histo passengers:");
 			System.out.println("passengers,rides");
 			for (Map.Entry<Integer, Integer> entry : histoPassengerRides.entrySet()) {
 				System.out.printf("%d,%d%n", entry.getKey(), entry.getValue().intValue());
@@ -114,9 +136,10 @@ public class CsvFilter {
 			System.out.println("hour,passengers");
 			for (int h = 0; h < pickupPagengersPerHour.length; h++) {
 				System.out.printf("%2d,%d%n", h, pickupPagengersPerHour[h]);
-			}
+			}*/
 
 
 		}
 	}
+}
 
