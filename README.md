@@ -9,3 +9,4 @@ muss noch erledigt/bearbeitet werden
     3. abends
 3. histogramme für tageszeiten (key: uhrzeit, value: anzahl der passengers) anzeigen
 4. evtl. uhrzeit mit den wenigsten/meisten fahrern?
+5. teuerste fahrt
