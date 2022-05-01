@@ -1,0 +1,108 @@
+package javaintro.ws21.wang;
+
+import org.geotools.data.FileDataStore;
+import org.geotools.data.FileDataStoreFinder;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+
+import java.io.*;
+import java.nio.file.Path;
+
+public class PointTest<p1, p2> {
+
+
+
+    public static void main(String[] args) throws IOException {
+        Path datadir = Path.of("D:/Heidelberg/3.Semester/Java/Project");
+        FileDataStore store = FileDataStoreFinder.getDataStore(datadir.resolve("taxi_zones.shp").toFile());
+
+        try (
+                InputStream fis = new FileInputStream(datadir.resolve("green_tripdata_2015-03.csv").toFile());
+                // InputStream gzipped = new GZIPInputStream(file);
+                Reader reader = new InputStreamReader(fis);
+                BufferedReader lines = new BufferedReader(reader)) {
+            String line = lines.readLine();
+            String[] row = line.split(",");
+
+            for (int i = 0; i < row.length; i = i + 1) {
+                System.out.printf("%2d - %s%n", i, row[i]);
+            }
+
+            while ((line = lines.readLine()) != null) {
+                row = line.split(",");
+                // System.out.println(line);
+
+
+                TaxiRecord record = new TaxiRecord(row);
+                //TaxiRecord record = null;
+//                try {
+//                    record = new TaxiRecord(row);
+//                } catch (Exception e) {
+//                    //e.printStackTrace();
+//                    continue;
+//                }
+
+
+                int passangers = record.getPassangers();
+
+                double distance = record.getDistance();
+               //boolean b = distance > 10;
+
+                //System.out.println("long distance route in NY:");
+                if (distance < 5) {
+
+                    double pickuplon = record.getPickupLongitude();
+                    double pickuplat = record.getPickupLatitude();
+                    double dropofflon = record.getDropoffLongitude();
+                    double dropofflat = record.getDropoffLatitude();
+                    // create rout between pickuppoints and dropoffpoints
+                    GeometryFactory geometryFactory = new GeometryFactory();
+                    Coordinate[] coordinates = new Coordinate[2];
+                    //start coordinate
+                    coordinates[0] = new Coordinate(pickuplon, pickuplat);
+
+                    //end coordinate
+                    coordinates[1] = new Coordinate(dropofflon, dropofflat);
+
+                    LineString lineString = geometryFactory.createLineString(coordinates);
+
+                    //point.setZ(5);
+
+                   System.out.println(lineString.toText());
+                    //System.out.println(distance);
+
+                }
+//                System.out.println("short distance route in NY:");
+//                if (distance < 5) {
+//
+//                    double pickuplon = record.getPickupLongitude();
+//                    double pickuplat = record.getPickupLatitude();
+//                    double dropofflon = record.getDropoffLongitude();
+//                    double dropofflat = record.getDropoffLatitude();
+//                    // create rout between pickuppoints and dropoffpoints
+//                    GeometryFactory geometryFactory = new GeometryFactory();
+//                    Coordinate[] coordinates = new Coordinate[2];
+//                    //start coordinate
+//                    coordinates[0] = new Coordinate(pickuplon, pickuplat);
+//
+//                    //end coordinate
+//                    coordinates[1] = new Coordinate(dropofflon, dropofflat);
+//
+//                    LineString lineString = geometryFactory.createLineString(coordinates);
+//
+//                    //point.setZ(5);
+//                    System.out.println("short distance route in NY:");
+//                    System.out.println(lineString.toText());
+//
+//                }
+
+                //System.out.println("distance："+ java.awt.Point.distance());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+}
