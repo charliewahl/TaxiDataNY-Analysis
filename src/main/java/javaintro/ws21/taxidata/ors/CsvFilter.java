@@ -25,7 +25,7 @@ import java.util.*;
 
 public class CsvFilter {
 
-    private static final GridCoverageFactory gcf = new GridCoverageFactory();
+    private static final GridCoverageFactory gcf = new GridCoverageFactory();// what does this GridCoverageFactory mean?
 
     static Map<String, String> map = new HashMap<>();
 
