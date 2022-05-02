@@ -107,8 +107,8 @@ public class CsvFilter {
 
 
                     pickupPagengersPerHour[pickupHour] += row.getPassengers();
-                    Integer rides = histoPassengerRides.getOrDefault(row.getPassengers(), 0);
-                    histoPassengerRides.put(row.getPassengers(), rides + 1);
+                    Integer rides = histoPassengerRides.getOrDefault(row.getPassengers(), 0);// unklar
+                    histoPassengerRides.put(row.getPassengers(), rides + 1);// ob die X axis hours? and y die Menge der Passengers?
                 }
 
             }
