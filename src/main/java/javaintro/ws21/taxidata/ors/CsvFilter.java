@@ -25,7 +25,7 @@ import java.util.*;
 
 public class CsvFilter {
 
-    private static final GridCoverageFactory gcf = new GridCoverageFactory();// what does this GridCoverageFactory mean?
+    private static final GridCoverageFactory gcf = new GridCoverageFactory();                    // what does this GridCoverageFactory mean?
 
     static Map<String, String> map = new HashMap<>();
 
@@ -107,15 +107,15 @@ public class CsvFilter {
 
 
                     pickupPagengersPerHour[pickupHour] += row.getPassengers();
-                    Integer rides = histoPassengerRides.getOrDefault(row.getPassengers(), 0);// unklar
-                    histoPassengerRides.put(row.getPassengers(), rides + 1);// ob die X axis hours? and y die Menge der Passengers?
+                    Integer rides = histoPassengerRides.getOrDefault(row.getPassengers(), 0);   // unklar
+                    histoPassengerRides.put(row.getPassengers(), rides + 1);                    // ob die X axis hours? and y die Menge der Passengers?
                 }
 
             }
             System.out.println("histo passengers:");
             System.out.println("passengers,rides");
             for (Map.Entry<Integer, Integer> entry : histoPassengerRides.entrySet()) {
-                System.out.printf("%d,%d%n", entry.getKey(), entry.getValue().intValue());
+                System.out.printf("%d,%d%n", entry.getKey(), entry.getValue().intValue());       // ???
             }
             System.out.println();
             System.out.println("aggregate pickup passengers per hour");
