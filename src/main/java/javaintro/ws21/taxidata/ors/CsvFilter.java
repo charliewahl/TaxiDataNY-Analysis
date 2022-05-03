@@ -27,7 +27,7 @@ public class CsvFilter {
 
     private static final GridCoverageFactory gcf = new GridCoverageFactory();                    // what does this GridCoverageFactory mean?
 
-    static Map<String, String> map = new HashMap<>();
+    static Map<String, String> map = new HashMap<>();                                            // why would u use this static Map map = new...
 
 
     public static void main(String[] args) throws IOException, FactoryException, TransformException {
@@ -118,7 +118,7 @@ public class CsvFilter {
                 System.out.printf("%d,%d%n", entry.getKey(), entry.getValue().intValue());       // ???
             }
             System.out.println();
-            System.out.println("aggregate pickup passengers per hour");
+            System.out.println("aggregate pickup passengers per hour");                          
             System.out.println("hour,passengers");
             for (int h = 0; h < pickupPagengersPerHour.length; h++) {
                 System.out.printf("%2d,%d%n", h, pickupPagengersPerHour[h]);
