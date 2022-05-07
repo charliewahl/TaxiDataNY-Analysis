@@ -27,7 +27,7 @@ public class CsvFilter {
 
     private static final GridCoverageFactory gcf = new GridCoverageFactory();                    // what does this GridCoverageFactory mean?
 
-    static Map<String, String> map = new HashMap<>();                                            // why would u use this static Map map = new...
+    static Map<String, String> map = new HashMap<>();                                            
 
 
     public static void main(String[] args) throws IOException, FactoryException, TransformException {
@@ -107,7 +107,7 @@ public class CsvFilter {
 
 
                     pickupPagengersPerHour[pickupHour] += row.getPassengers();
-                    Integer rides = histoPassengerRides.getOrDefault(row.getPassengers(), 0);   // unklar
+                    Integer rides = histoPassengerRides.getOrDefault(row.getPassengers(), 0);   // unklar, 0?
                     histoPassengerRides.put(row.getPassengers(), rides + 1);                    // ob die X axis hours? and y die Menge der Passengers?
                 }
 
